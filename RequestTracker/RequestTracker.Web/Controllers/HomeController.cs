@@ -1,5 +1,4 @@
-﻿using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
 namespace RequestTracker.Web.Controllers
 {
@@ -31,17 +30,6 @@ namespace RequestTracker.Web.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
-        }
-    }
-
-    internal class DbClass
-    {
-        public static object UserName
-        {
-            get
-            {
-                return HttpContext.Current.Session.SessionID;
-            }
         }
     }
 }
