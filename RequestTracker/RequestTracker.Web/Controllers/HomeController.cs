@@ -7,6 +7,8 @@ namespace RequestTracker.Web.Controllers
         public ActionResult Index()
         {
             var sessionId = HttpContext.Session.SessionID;
+            var username = User.Identity.Name;
+
             return View();
         }
 

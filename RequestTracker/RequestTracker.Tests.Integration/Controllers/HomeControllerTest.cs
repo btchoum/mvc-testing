@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -14,6 +15,17 @@ namespace RequestTracker.Tests.Integration.Controllers
         [Test]
         public void Index()
         {
+            var controller = CreateController();
+
+            // Act
+            ViewResult result = controller.Index() as ViewResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+        }
+
+        private HomeController CreateController()
+        {
             var server = new Mock<HttpServerUtilityBase>(MockBehavior.Loose);
             var response = new Mock<HttpResponseBase>(MockBehavior.Strict);
 
@@ -23,30 +35,27 @@ namespace RequestTracker.Tests.Integration.Controllers
             var session = new Mock<HttpSessionStateBase>();
             session.Setup(s => s.SessionID).Returns(Guid.NewGuid().ToString());
 
+            IPrincipal currentUser = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+
             var context = new Mock<HttpContextBase>();
             context.SetupGet(c => c.Request).Returns(request.Object);
             context.SetupGet(c => c.Response).Returns(response.Object);
             context.SetupGet(c => c.Server).Returns(server.Object);
             context.SetupGet(c => c.Session).Returns(session.Object);
+            context.SetupGet(c => c.User).Returns(currentUser);
 
             // Arrange
             HomeController controller = new HomeController();
             controller.ControllerContext = new ControllerContext(context.Object,
                                                 new RouteData(), controller);
-
-
-            // Act
-            ViewResult result = controller.Index() as ViewResult;
-
-            // Assert
-            Assert.IsNotNull(result);
+            return controller;
         }
 
         [Test]
         public void About()
         {
             // Arrange
-            HomeController controller = new HomeController();
+            var controller = CreateController();
 
             // Act
             ViewResult result = controller.About() as ViewResult;
@@ -59,7 +68,7 @@ namespace RequestTracker.Tests.Integration.Controllers
         public void Contact()
         {
             // Arrange
-            HomeController controller = new HomeController();
+            var controller = CreateController();
 
             // Act
             ViewResult result = controller.Contact() as ViewResult;
