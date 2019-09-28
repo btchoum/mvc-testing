@@ -20,8 +20,16 @@ namespace RequestTracker.Tests.Integration.Controllers
             // Act
             ViewResult result = controller.Index() as ViewResult;
 
+            var loggedInUser = result.ViewData["UserName"] as string;
+
             // Assert
-            Assert.IsNotNull(result);
+            Assert.Multiple(() =>
+            {
+                Assert.IsNotNull(result);
+                Assert.That(loggedInUser, Is.Not.Null);
+                Assert.That(loggedInUser, Does.Contain(Environment.UserName).IgnoreCase);
+                Assert.That(loggedInUser, Does.Contain(Environment.UserDomainName).IgnoreCase);
+            });
         }
 
         private HomeController CreateController()
@@ -41,8 +49,14 @@ namespace RequestTracker.Tests.Integration.Controllers
             context.SetupGet(c => c.Request).Returns(request.Object);
             context.SetupGet(c => c.Response).Returns(response.Object);
             context.SetupGet(c => c.Server).Returns(server.Object);
-            context.SetupGet(c => c.Session).Returns(session.Object);
             context.SetupGet(c => c.User).Returns(currentUser);
+
+            HttpContext.Current = MockHelpers.FakeHttpContext();
+            HttpContext.Current.Session["SomeSessionVariable"] = 123;
+            //context.SetupGet(c => c.Session).Returns(session.Object);
+            HttpSessionStateBase sessionBase = new HttpSessionStateWrapper(HttpContext.Current.Session);
+
+            context.SetupGet(c => c.Session).Returns(sessionBase);
 
             // Arrange
             HomeController controller = new HomeController();

@@ -6,8 +6,12 @@ namespace RequestTracker.Web.Controllers
     {
         public ActionResult Index()
         {
-            var sessionId = HttpContext.Session.SessionID;
-            var username = User.Identity.Name;
+            var sessionId = HttpContext.Session.SessionID.ToUpper();
+            var username = User.Identity.Name.ToLower();
+
+            Session["loggedInUser"] = username;
+
+            ViewData["UserName"] = Session["loggedInUser"].ToString();
 
             return View();
         }
