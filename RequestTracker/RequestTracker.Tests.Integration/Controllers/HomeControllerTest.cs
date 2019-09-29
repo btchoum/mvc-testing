@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Moq;
 using NUnit.Framework;
 using RequestTracker.Web.Controllers;
+using RequestTracker.Web.Models;
 
 namespace RequestTracker.Tests.Integration.Controllers
 {
@@ -15,10 +14,11 @@ namespace RequestTracker.Tests.Integration.Controllers
         [Test]
         public void Index()
         {
+            // Arrange
             var controller = CreateController();
 
             // Act
-            ViewResult result = controller.Index() as ViewResult;
+            var result = controller.Index() as ViewResult;
 
             var loggedInUser = result.ViewData["UserName"] as string;
 
@@ -50,9 +50,12 @@ namespace RequestTracker.Tests.Integration.Controllers
             var controller = CreateController();
 
             // Act
-            ViewResult result = controller.About() as ViewResult;
+            var result = controller.About() as ViewResult;
+            var appUser = result.ViewData["ApplicationUser"] as ApplicationUser;
 
             // Assert
+            Assert.That(appUser, Is.Not.Null);
+            Assert.That(appUser.Username, Does.Contain(Environment.UserName).IgnoreCase);
             Assert.AreEqual("Your application description page.", result.ViewBag.Message);
         }
 
@@ -63,10 +66,13 @@ namespace RequestTracker.Tests.Integration.Controllers
             var controller = CreateController();
 
             // Act
-            ViewResult result = controller.Contact() as ViewResult;
+            var result = controller.Contact() as ViewResult;
+            var appUser = result.ViewData["ApplicationUser"] as ApplicationUser;
 
             // Assert
             Assert.IsNotNull(result);
+            Assert.That(appUser, Is.Not.Null);
+            Assert.That(appUser.Username, Does.Contain(Environment.UserName).IgnoreCase);
         }
     }
 }

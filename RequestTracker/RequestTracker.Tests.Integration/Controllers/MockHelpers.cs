@@ -11,11 +11,10 @@ namespace RequestTracker.Tests.Integration.Controllers
         public static HttpContext FakeHttpContext()
         {
             var httpRequest = new HttpRequest("", "http://localhost/", "");
-            var stringWriter = new StringWriter();
-            var httpResponce = new HttpResponse(stringWriter);
+            var httpResponce = new HttpResponse(new StringWriter());
             var httpContext = new HttpContext(httpRequest, httpResponce);
-            IPrincipal currentUser = new WindowsPrincipal(WindowsIdentity.GetCurrent());
-            httpContext.User = currentUser;
+
+            httpContext.User = new WindowsPrincipal(WindowsIdentity.GetCurrent());
 
             var sessionId = Guid.NewGuid().ToString();
             var sessionContainer = new HttpSessionStateContainer(sessionId, new SessionStateItemCollection(), new HttpStaticObjectsCollection(), 10, true, HttpCookieMode.AutoDetect, SessionStateMode.InProc, false);
