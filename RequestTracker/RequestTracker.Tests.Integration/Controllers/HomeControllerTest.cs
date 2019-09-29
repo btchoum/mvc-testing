@@ -34,34 +34,12 @@ namespace RequestTracker.Tests.Integration.Controllers
 
         private HomeController CreateController()
         {
-            //var server = new Mock<HttpServerUtilityBase>(MockBehavior.Loose);
-            //var response = new Mock<HttpResponseBase>(MockBehavior.Strict);
-
-            //var request = new Mock<HttpRequestBase>(MockBehavior.Strict);
-            //request.Setup(r => r.UserHostAddress).Returns("127.0.0.1");
-
-            //var session = new Mock<HttpSessionStateBase>();
-            //session.Setup(s => s.SessionID).Returns(Guid.NewGuid().ToString());
-
-            IPrincipal currentUser = new WindowsPrincipal(WindowsIdentity.GetCurrent());
-
-            var context = new Mock<HttpContextBase>();
-            //context.SetupGet(c => c.Request).Returns(request.Object);
-            //context.SetupGet(c => c.Response).Returns(response.Object);
-            //context.SetupGet(c => c.Server).Returns(server.Object);
-            context.SetupGet(c => c.User).Returns(currentUser);
-
             HttpContext.Current = MockHelpers.FakeHttpContext();
-            HttpContext.Current.Session["SomeSessionVariable"] = 123;
-            //context.SetupGet(c => c.Session).Returns(session.Object);
-            HttpSessionStateBase sessionBase = new HttpSessionStateWrapper(HttpContext.Current.Session);
+            var context = new HttpContextWrapper(HttpContext.Current);
 
-            context.SetupGet(c => c.Session).Returns(sessionBase);
+            var controller = new HomeController();
+            controller.ControllerContext = new ControllerContext(context, new RouteData(), controller);
 
-            // Arrange
-            HomeController controller = new HomeController();
-            controller.ControllerContext = new ControllerContext(context.Object,
-                                                new RouteData(), controller);
             return controller;
         }
 
